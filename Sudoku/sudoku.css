@@ -1,0 +1,41 @@
+#sudokuGrid {
+    margin: auto;
+    max-width: 50%;
+    border: 3px solid black;
+    display: grid;
+    z-index: 1;
+    position: relative;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.sub-grid-item {
+    display: grid;
+    border: 2px solid black;
+    aspect-ratio: 1/1;
+    position: relative;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+#largeGrid {
+    margin: auto;
+    max-width: 50%;
+    display: grid;
+    z-index: -1;
+    position: relative;
+    grid-template-columns: 1fr 1fr;
+}
+
+.grid-item {
+    border: 1px solid black;
+    text-align: center;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.grid-item:hover {
+    background-color: red;
+}
