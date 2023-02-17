@@ -56,3 +56,12 @@ form {
     text-align: center;
     margin: 2em;
 }
+
+.center {
+    text-align: center;
+    margin: 1em;
+}
+
+button {
+    text-align: center;
+}
