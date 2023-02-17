@@ -1,9 +1,18 @@
+:root {
+    --primary-color: blanchedalmond;
+    --secondary-color: black;
+    color: var(--secondary-color);
+}
+
+body {
+    background-color: var(--primary-color);
+}
+
 #sudokuGrid {
     margin: auto;
     max-width: 50%;
-    border: 3px solid black;
+    border: 3px solid var(--secondary-color);
     display: grid;
-    z-index: 1;
     position: relative;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
@@ -11,7 +20,7 @@
 
 .sub-grid-item {
     display: grid;
-    border: 2px solid black;
+    border: 2px solid var(--secondary-color);
     aspect-ratio: 1/1;
     position: relative;
     grid-template-columns: repeat(3, 1fr);
@@ -22,20 +31,28 @@
     margin: auto;
     max-width: 50%;
     display: grid;
-    z-index: -1;
     position: relative;
     grid-template-columns: 1fr 1fr;
 }
 
 .grid-item {
-    border: 1px solid black;
+    border: 1px solid var(--secondary-color);
     text-align: center;
     aspect-ratio: 1/1;
     display: flex;
     align-items: center;
     justify-content: center;
+
+    font-family: "Helvetica", sans-serif;
+    font-size: 4vw;
+    
 }
 
 .grid-item:hover {
     background-color: red;
+}
+
+form {
+    text-align: center;
+    margin: 2em;
 }

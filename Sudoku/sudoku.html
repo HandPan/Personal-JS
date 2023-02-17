@@ -7,47 +7,25 @@
     <title>Sudoku Solver</title>
 
     <!-- Scripts -->
+    
     <script type="text/JavaScript" src="sudoku.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script> -->
     <link type="text/css" rel="stylesheet" href="sudoku.css">
     
 </head>
-<body style="background-color:blanchedalmond;">
+<body>
     
     <h1 style="text-align: center;"">Sudoku Solver Speed Tests</h1>
     <h3 title="Tooltip Test" style="text-align: center;">Information Theory aka. Entropy</h3>
-    <!-- <hr style="color: black;"> -->
 
-    <!-- <p id="demo">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eaque non perferendis iure asperiores facere, ratione, doloribus, nisi culpa quod fuga dolorum cum exercitationem quos itaque quisquam libero labore? A, tempore!</p> -->
+    <!-- <button type="button" onclick="makeGrid(), codeParser('530070000600195000098000060800060003400803001700020006060000280000419005000080079')" id="testButton">Does it Work?</button> -->
 
-
-    <!-- <script>
-        const myArr = [1, 2, 3, 4];
-        const shape = [2, 2];
-        const tensorA = tf.tensor(myArr, shape);
-        tensorA.array().then(array => display(array[0]));
-
-        function display(data) {
-            document.getElementById("demo").innerHTML = data;
-        }
-    </script> -->
-
-
-    <!-- <button type="button" onclick="document.getElementById('demo').innerHTML = 'Hello JavaScript'">Update Text</button> -->
-    <!-- <button type="button" onclick="makeGrid(16, 16)">Test JS</button> -->
-
-    <!-- <svg width="100" height="100">
-        <circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />
-      </svg>
-
-      <svg height="200" width="500">
-        <polyline points="20,20 40,25 60,40 80,120 120,140 200,180"
-        style="fill:none;stroke:black;stroke-width:3" />
-      </svg> -->
-
-    <button type="button" onclick="makeGrid()" id="testButton">Does it Work?</button>
-    <p id="testButton">Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa, at labore mollitia laboriosam autem, expedita amet praesentium repellendus pariatur, a obcaecati. Molestias enim dignissimos molestiae, quas exercitationem consequuntur vel adipisci.</p>
-
+    <form action="javascript:submitted()">
+        <label for="inputCode">Input a code to be solved!</label><br>
+        <input type="text" id="inputCodeBox"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    
     <div class="mainView">
         <div id="sudokuGrid">
         </div>
