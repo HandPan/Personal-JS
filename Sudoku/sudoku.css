@@ -8,43 +8,97 @@ body {
     background-color: var(--primary-color);
 }
 
-#sudokuGrid {
+.mainView {
     margin: auto;
-    max-width: 50%;
-    border: 3px solid var(--secondary-color);
+    /* max-width: 70%; */
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    border: 5px solid red;
+    
+}
+
+.displayValues {
+    /* float: right; */
+    /* display: none; */
+    margin: 20px;
+    width: fit-content;
+    border: 5px solid blue;
+    /* display: inline-block; */
+    /* margin: auto; */
+    /* max-width: 50%; */
+}
+
+#sudokuGrid {
+    /* margin: auto; */
+    /* max-width: 50%; */
+    /* width: 500px; */
+    /* width: fit-content; */
+    /* width: 45vb; */
+    margin: 20px;
+    /* border: 3px solid var(--secondary-color); */
+    border: 5px solid green;
     display: grid;
     position: relative;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
+    /* grid-template-columns: auto auto auto; */
+    /* display: inline-block; */
+    /* padding-right: 50px; */
+    /* grid-auto-rows: minmax(min-content, max-content); */
+    /* grid-auto-columns: minmax(min-content, max-content); */
 }
 
 .sub-grid-item {
     display: grid;
+    /* width: 20vw; */
     border: 2px solid var(--secondary-color);
     aspect-ratio: 1/1;
     position: relative;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
+    /* grid-auto-rows: minmax(min-content, max-content); */
+    /* grid-auto-columns: minmax(min-content, max-content); */
+
 }
 
-#largeGrid {
+/* #largeGrid {
     margin: auto;
     max-width: 50%;
     display: grid;
     position: relative;
     grid-template-columns: 1fr 1fr;
+} */
+
+/* .sub-grid-item::before {
+    display: block;
+    height: 0;
+    width: 0;
+    padding-bottom: 100%;
 }
 
+.grid-item::before {
+    display: block;
+    height: 0;
+    width: 0;
+    padding-bottom: 100%;
+} */
+
 .grid-item {
+    width: 3vw;
     border: 1px solid var(--secondary-color);
     text-align: center;
     aspect-ratio: 1/1;
+    /* width: 10vh; */
+    /* height: 0; */
     display: flex;
     align-items: center;
     justify-content: center;
 
     font-family: "Helvetica", sans-serif;
-    font-size: 4vw;
+    font-size: 2vw;
     
 }
 
@@ -65,3 +119,4 @@ form {
 button {
     text-align: center;
 }
+
