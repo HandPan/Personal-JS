@@ -23,6 +23,7 @@ function submitted() {
 function makeGrid() {
     
     if (!gridActive) {
+        document.getElementById("mainView").style.display = "flex";
         const sudokuGrid = document.getElementById("sudokuGrid");
     
         let total = 0;
@@ -47,18 +48,20 @@ function makeGrid() {
                             entropy : 9,
                             possi : possibilities
                         };
+
+                        cellDisplay.onmouseover = function(){updateDisplayData(cell)}
+                        cellDisplay.onmouseout = function() {
+                            document.getElementById("displayValues").style.visibility = "hidden";
+                        };
+                        
                         squares[total] = cell;
                         total++;
-        
+                        
                         // Test display values
                         cellDisplay.innerText = (total-1);
                         // cellDisplay.innerText = (calcColumnStart(total));
                         // cellDisplay.innerText = (calcRowStart(total));
                         // cellDisplay.innerText = (calcSubSquareStart(total));
-
-                        // let posDisplay = document.createElement("div");
-                        // posDisplay.innerText = (total);
-                        // cellDisplay.appendChild(posDisplay).className = "grid-position";
 
                         largeCell.appendChild(cellDisplay).className = "grid-item";
                     }
@@ -261,4 +264,22 @@ function calcSubSquareStart(value) {
     // return subRow;
 
     return value - (subRow*9) - subCol;
+}
+
+function updateDisplayData(square) {
+    // square = squares[0];
+
+    let displayValues = document.getElementById("displayValues");
+    displayValues.style.visibility = "visible";
+
+    let possi = [];
+    let i = 0;
+
+    square.possi.forEach(element => {
+        if (element) {
+           possi.push(element); 
+        }
+    });
+
+    displayValues.innerHTML = ('<h1>Grid Position: <span style="font-weight: normal; ">' + square.id + '</span></h1> <h1>Cell Display: <span style="font-weight: normal;">' + square.cellValue + '</span></h1> <h1>Entropy: <span style="font-weight: normal;">' + square.entropy + '</span></h1> <h1>Id: <span style="font-weight: normal;">' + square.id + '</span></h1> <h1>Possibilities: <span style="font-weight: normal; display: block;";>' + possi + '</span></h1>');
 }
