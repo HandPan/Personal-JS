@@ -132,8 +132,14 @@ function calcInitialEntropy() {
                         curSquare.entropy--;
 
                         // Temp display entropy
-                        curSquare.cellDisplay.innerText = curSquare.entropy;
-                        curSquare.cellDisplay.style.color = "red";
+                        // curSquare.cellDisplay.innerText = curSquare.entropy;
+                        // curSquare.cellDisplay.style.color = "red";
+
+                        if (curSquare.entropy == 1) {
+                            console.log("Updated");
+                            curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
+                            curSquare.cellDisplay.style.backgroundColor = "green";
+                        }
 
                     }
                 }
@@ -148,13 +154,14 @@ function calcInitialEntropy() {
                 //     curSquare.cellDisplay.innerText = curSquare.cellValue;
                 //     curSquare.cellDisplay.style.color = "black";
                 // }
+
                 i++;
             }
 
             // Columns
             let j = calcColumnStart(square.id+1)-1;
             // console.log(j);
-            let end_j = j + 72;
+            let end_j = j + 73;
             while (j < end_j) {
                 let curSquare = squares[j];
                 if (curSquare.entropy != 0 && curSquare.entropy != 1) {
@@ -163,8 +170,14 @@ function calcInitialEntropy() {
                         curSquare.entropy--;
 
                         // Temp display entropy
-                        curSquare.cellDisplay.innerText = curSquare.entropy;
-                        curSquare.cellDisplay.style.color = "red";
+                        // curSquare.cellDisplay.innerText = curSquare.entropy;
+                        // curSquare.cellDisplay.style.color = "red";
+
+                        if (curSquare.entropy == 1) {
+                            console.log("Updated");
+                            curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
+                            curSquare.cellDisplay.style.backgroundColor = "green";
+                        }
                     }
                 }
 
@@ -178,6 +191,7 @@ function calcInitialEntropy() {
                 //     curSquare.cellDisplay.innerText = curSquare.cellValue;
                 //     curSquare.cellDisplay.style.color = "black";
                 // }
+
                 j += 9;
             }
 
@@ -195,8 +209,14 @@ function calcInitialEntropy() {
                         curSquare.entropy--;
 
                         // Temp display entropy
-                        curSquare.cellDisplay.innerText = curSquare.entropy;
-                        curSquare.cellDisplay.style.color = "red";
+                        // curSquare.cellDisplay.innerText = curSquare.entropy;
+                        // curSquare.cellDisplay.style.color = "red";
+
+                        if (curSquare.entropy == 1) {
+                            console.log("Updated");
+                            curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
+                            curSquare.cellDisplay.style.backgroundColor = "green";
+                        }
                     }
                 }
 
@@ -210,7 +230,6 @@ function calcInitialEntropy() {
                 //     curSquare.cellDisplay.innerText = curSquare.cellValue;
                 //     curSquare.cellDisplay.style.color = "black";
                 // }
-
                 
                 if ((k+1)%3 == 0) {
                     k += 7;
@@ -223,16 +242,105 @@ function calcInitialEntropy() {
     });
 }
 
-// function solve() {
-//     squares.forEach(element => {
-//         if (element.entropy == 1)
-//     });
-// }
+function solveOne(square) {
+    if (square.entropy != 1) {
+        return;
+    }
+
+    if (square.cellValue == 0) {
+        let c = 0;
+        while (!square.possi[c]) {
+            c++;
+        }
+        square.cellValue = square.possi[c];
+        square.cellDisplay.innerText = square.cellValue;
+        square.cellDisplay.style.color = "black";
+        square.entropy = 0;
+        square.cellDisplay.onclick = null;
+        square.cellDisplay.style.backgroundColor = null;
+    }
+
+    // console.log(square);
+    // Rows
+    let i = calcRowStart(square.id+1)-1;
+    let end_i = i + 9;
+    while (i < end_i) {
+        let curSquare = squares[i];
+        if (curSquare.entropy != 0 && curSquare.entropy != 1) {
+            if (curSquare.possi[square.cellValue-1]) {
+                curSquare.possi[square.cellValue-1] = 0;
+                curSquare.entropy--;
+
+                // Temp display entropy
+                // curSquare.cellDisplay.innerText = curSquare.entropy;
+                // curSquare.cellDisplay.style.color = "red";
+
+                if (curSquare.entropy == 1) {
+                    curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
+                    curSquare.cellDisplay.style.backgroundColor = "green";
+                }
+
+            }
+        }
+        i++;
+    }
+
+    // Columns
+    let j = calcColumnStart(square.id+1)-1;
+    let end_j = j + 73;
+    while (j < end_j) {
+        let curSquare = squares[j];
+        // console.log(j);
+        // console.log(curSquare);
+        if (curSquare.entropy != 0 && curSquare.entropy != 1) {
+            if (curSquare.possi[square.cellValue-1]) {
+                curSquare.possi[square.cellValue-1] = 0;
+                curSquare.entropy--;
+
+                // Temp display entropy
+                // curSquare.cellDisplay.innerText = curSquare.entropy;
+                // curSquare.cellDisplay.style.color = "red";
+
+                if (curSquare.entropy == 1) {
+                    curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
+                    curSquare.cellDisplay.style.backgroundColor = "green";
+                }
+
+                
+            }
+        }
+        j += 9;
+    }
+
+    // SubSquares
+    let k = calcSubSquareStart(square.id+1)-1;
+    let end_k = k + 21;
+    while (k < end_k) {
+        let curSquare = squares[k];
+        if (curSquare.entropy != 0 && curSquare.entropy != 1) {
+            if (curSquare.possi[square.cellValue-1]) {
+                curSquare.possi[square.cellValue-1] = 0;
+                curSquare.entropy--;
+
+                // Temp display entropy
+                // curSquare.cellDisplay.innerText = curSquare.entropy;
+                // curSquare.cellDisplay.style.color = "red";
+
+                if (curSquare.entropy == 1) {
+                    curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
+                    curSquare.cellDisplay.style.backgroundColor = "green";
+                }
 
 
+            }
+        }
 
-function recurseSolve() {
-
+        if ((k+1)%3 == 0) {
+            k += 7;
+        } else {
+            k++;
+        }
+    }
 }
 
 function calcRowStart(value) {
@@ -282,4 +390,10 @@ function updateDisplayData(square) {
     });
 
     displayValues.innerHTML = ('<h1>Grid Position: <span style="font-weight: normal; ">' + square.id + '</span></h1> <h1>Cell Display: <span style="font-weight: normal;">' + square.cellValue + '</span></h1> <h1>Entropy: <span style="font-weight: normal;">' + square.entropy + '</span></h1> <h1>Id: <span style="font-weight: normal;">' + square.id + '</span></h1> <h1>Possibilities: <span style="font-weight: normal; display: block;";>' + possi + '</span></h1>');
+}
+
+
+// Test/Partial Implementation
+function userInitiateOne(square) {
+    solveOne(square);
 }
