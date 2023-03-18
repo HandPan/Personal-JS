@@ -14,8 +14,12 @@ function testJS() {
 let squares = new Array(81);
 let startCode = new Array(81);
 let gridActive = false;
+let solvedSquares = 0;
+let entropyDisplay;
 
 function submitted() {
+    entropyDisplay = document.getElementById("entropy");
+    entropyDisplay.innerText = " " + 81;
     makeGrid();
     codeParser();
 }
@@ -89,31 +93,52 @@ function codeParser() {
 
 function inputFromCode() {
     // Clear any previous data
-    squares.forEach(element => {
-        element.cellValue = 0;
-        element.cellDisplay.innerText = "";
-        element.entropy = 9;
-    });
+    clearBoard();
 
     // Fill grid with input data
     let i = 0;
     let cur;
     if (startCode) {
-        console.log(startCode);
+        // console.log(startCode);
         startCode.forEach(element => {
             cur = squares[i];
             cur.cellValue = element;
             if (element != 0) {
                 cur.cellDisplay.innerText = element;
+                cur.cellDisplay.style.color = "black";
                 cur.entropy = 0;
                 for (let j = 0; j < 9; j++) {
                     if (cur.possi[j] != element) {
                         cur.possi[j] = 0;
                     }
                 }
+                solvedSquares++;
+                entropyDisplay.innerHTML = " " + (81 - solvedSquares);
             }
             i++;
         });
+    }
+}
+
+function checkSquare(curSquare, square, recurse) {
+    if (curSquare.entropy != 0 && curSquare.entropy != 1) {
+        if (curSquare.possi[square.cellValue-1]) {
+            curSquare.possi[square.cellValue-1] = 0;
+            curSquare.entropy--;
+
+            // Temp display entropy
+            curSquare.cellDisplay.innerText = curSquare.entropy;
+            curSquare.cellDisplay.style.color = "red";
+
+            if (curSquare.entropy == 1) {
+                curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
+                curSquare.cellDisplay.style.backgroundColor = "green";
+            }
+
+            if (recurse && curSquare.entropy == 1) {
+                solveOne(curSquare, true);
+            }
+        }
     }
 }
 
@@ -125,124 +150,47 @@ function calcInitialEntropy() {
             let i = calcRowStart(square.id+1)-1;
             let end_i = i + 9;
             while (i < end_i) {
-                let curSquare = squares[i];
-                if (curSquare.entropy != 0 && curSquare.entropy != 1) {
-                    if (curSquare.possi[square.cellValue-1]) {
-                        curSquare.possi[square.cellValue-1] = 0;
-                        curSquare.entropy--;
-
-                        // Temp display entropy
-                        // curSquare.cellDisplay.innerText = curSquare.entropy;
-                        // curSquare.cellDisplay.style.color = "red";
-
-                        if (curSquare.entropy == 1) {
-                            console.log("Updated");
-                            curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
-                            curSquare.cellDisplay.style.backgroundColor = "green";
-                        }
-
-                    }
-                }
-
-                // Temp for test solver
-                // if (curSquare.entropy == 1 && curSquare.cellValue == 0) {
-                //     let c = 0;
-                //     while (!curSquare.possi[c]) {
-                //         c++;
-                //     }
-                //     curSquare.cellValue = curSquare.possi[c];
-                //     curSquare.cellDisplay.innerText = curSquare.cellValue;
-                //     curSquare.cellDisplay.style.color = "black";
-                // }
-
+                checkSquare(squares[i], square, false);
                 i++;
             }
 
             // Columns
             let j = calcColumnStart(square.id+1)-1;
-            // console.log(j);
             let end_j = j + 73;
             while (j < end_j) {
-                let curSquare = squares[j];
-                if (curSquare.entropy != 0 && curSquare.entropy != 1) {
-                    if (curSquare.possi[square.cellValue-1]) {
-                        curSquare.possi[square.cellValue-1] = 0;
-                        curSquare.entropy--;
-
-                        // Temp display entropy
-                        // curSquare.cellDisplay.innerText = curSquare.entropy;
-                        // curSquare.cellDisplay.style.color = "red";
-
-                        if (curSquare.entropy == 1) {
-                            console.log("Updated");
-                            curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
-                            curSquare.cellDisplay.style.backgroundColor = "green";
-                        }
-                    }
-                }
-
-                // Temp for test solver
-                // if (curSquare.entropy == 1 && curSquare.cellValue == 0) {
-                //     let c = 0;
-                //     while (!curSquare.possi[c]) {
-                //         c++;
-                //     }
-                //     curSquare.cellValue = curSquare.possi[c];
-                //     curSquare.cellDisplay.innerText = curSquare.cellValue;
-                //     curSquare.cellDisplay.style.color = "black";
-                // }
-
+                checkSquare(squares[j], square, false);
                 j += 9;
             }
 
-
             // SubSquares
             let k = calcSubSquareStart(square.id+1)-1;
-            // console.log(k);
             let end_k = k + 21;
             while (k < end_k) {
-                // console.log(k);
-                let curSquare = squares[k];
-                if (curSquare.entropy != 0 && curSquare.entropy != 1) {
-                    if (curSquare.possi[square.cellValue-1]) {
-                        curSquare.possi[square.cellValue-1] = 0;
-                        curSquare.entropy--;
-
-                        // Temp display entropy
-                        // curSquare.cellDisplay.innerText = curSquare.entropy;
-                        // curSquare.cellDisplay.style.color = "red";
-
-                        if (curSquare.entropy == 1) {
-                            console.log("Updated");
-                            curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
-                            curSquare.cellDisplay.style.backgroundColor = "green";
-                        }
-                    }
-                }
-
-                // Temp for test solver
-                // if (curSquare.entropy == 1 && curSquare.cellValue == 0) {
-                //     let c = 0;
-                //     while (!curSquare.possi[c]) {
-                //         c++;
-                //     }
-                //     curSquare.cellValue = curSquare.possi[c];
-                //     curSquare.cellDisplay.innerText = curSquare.cellValue;
-                //     curSquare.cellDisplay.style.color = "black";
-                // }
-                
+                checkSquare(squares[k], square, false);
                 if ((k+1)%3 == 0) {
                     k += 7;
                 } else {
                     k++;
                 }
             }
-
         }
     });
 }
 
-function solveOne(square) {
+function solveOneRecursive() {
+    if (solvedSquares == 0) {
+        return;
+    }
+
+    calcInitialEntropy();
+    squares.forEach(square => {
+        if (square.entropy == 1) {
+            solveOne(square, true);
+        }
+    });
+}
+
+function solveOne(square, recurse) {
     if (square.entropy != 1) {
         return;
     }
@@ -258,30 +206,15 @@ function solveOne(square) {
         square.entropy = 0;
         square.cellDisplay.onclick = null;
         square.cellDisplay.style.backgroundColor = null;
+        solvedSquares++;
+        entropyDisplay.innerHTML = " " + (81 - solvedSquares);
     }
 
-    // console.log(square);
     // Rows
     let i = calcRowStart(square.id+1)-1;
     let end_i = i + 9;
     while (i < end_i) {
-        let curSquare = squares[i];
-        if (curSquare.entropy != 0 && curSquare.entropy != 1) {
-            if (curSquare.possi[square.cellValue-1]) {
-                curSquare.possi[square.cellValue-1] = 0;
-                curSquare.entropy--;
-
-                // Temp display entropy
-                // curSquare.cellDisplay.innerText = curSquare.entropy;
-                // curSquare.cellDisplay.style.color = "red";
-
-                if (curSquare.entropy == 1) {
-                    curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
-                    curSquare.cellDisplay.style.backgroundColor = "green";
-                }
-
-            }
-        }
+        checkSquare(squares[i], square, recurse);
         i++;
     }
 
@@ -289,26 +222,7 @@ function solveOne(square) {
     let j = calcColumnStart(square.id+1)-1;
     let end_j = j + 73;
     while (j < end_j) {
-        let curSquare = squares[j];
-        // console.log(j);
-        // console.log(curSquare);
-        if (curSquare.entropy != 0 && curSquare.entropy != 1) {
-            if (curSquare.possi[square.cellValue-1]) {
-                curSquare.possi[square.cellValue-1] = 0;
-                curSquare.entropy--;
-
-                // Temp display entropy
-                // curSquare.cellDisplay.innerText = curSquare.entropy;
-                // curSquare.cellDisplay.style.color = "red";
-
-                if (curSquare.entropy == 1) {
-                    curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
-                    curSquare.cellDisplay.style.backgroundColor = "green";
-                }
-
-                
-            }
-        }
+        checkSquare(squares[j], square, recurse);
         j += 9;
     }
 
@@ -316,25 +230,7 @@ function solveOne(square) {
     let k = calcSubSquareStart(square.id+1)-1;
     let end_k = k + 21;
     while (k < end_k) {
-        let curSquare = squares[k];
-        if (curSquare.entropy != 0 && curSquare.entropy != 1) {
-            if (curSquare.possi[square.cellValue-1]) {
-                curSquare.possi[square.cellValue-1] = 0;
-                curSquare.entropy--;
-
-                // Temp display entropy
-                // curSquare.cellDisplay.innerText = curSquare.entropy;
-                // curSquare.cellDisplay.style.color = "red";
-
-                if (curSquare.entropy == 1) {
-                    curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
-                    curSquare.cellDisplay.style.backgroundColor = "green";
-                }
-
-
-            }
-        }
-
+        checkSquare(squares[k], square, recurse);
         if ((k+1)%3 == 0) {
             k += 7;
         } else {
@@ -392,8 +288,18 @@ function updateDisplayData(square) {
     displayValues.innerHTML = ('<h1>Grid Position: <span style="font-weight: normal; ">' + square.id + '</span></h1> <h1>Cell Display: <span style="font-weight: normal;">' + square.cellValue + '</span></h1> <h1>Entropy: <span style="font-weight: normal;">' + square.entropy + '</span></h1> <h1>Id: <span style="font-weight: normal;">' + square.id + '</span></h1> <h1>Possibilities: <span style="font-weight: normal; display: block;";>' + possi + '</span></h1>');
 }
 
+function clearBoard() {
+    solvedSquares = 0;
+    entropyDisplay.innerHTML = " " + (81 - solvedSquares);
+    squares.forEach(square => {
+        square.cellValue = 0;
+        square.cellDisplay.innerText = "";
+        square.entropy = 9;
+        square.possi = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    });
+}
 
 // Test/Partial Implementation
 function userInitiateOne(square) {
-    solveOne(square);
+    solveOne(square, false);
 }
