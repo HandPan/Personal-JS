@@ -23,7 +23,7 @@
 
     <form action="javascript:submitted()">
         <label for="inputCode">Input a code to be solved!</label><br>
-        <input type="text" id="inputCodeBox"><br><br>
+        <input type="text" id="inputCodeBox" onfocus="this.value=''"><br><br>
         <input type="submit" value="Submit">
     </form>
     
@@ -44,8 +44,10 @@
     <div class="center">
         <button type="button" onclick="calcInitialEntropy()">Run initial pass</button>
         <button type="button" onclick="solveOneRecursive()">Solve Recursively</button>
+        <button type="button" onclick="checkFullErrors()">Check for Errors</button>
     </div>
     <div class="center"><button type="button" onclick="clearBoard()">Clear Board</button></div>
+    <div id="options" class="center"></div>
     
 </body>
 </html>

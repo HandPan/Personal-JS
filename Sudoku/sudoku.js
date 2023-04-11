@@ -135,6 +135,10 @@ function checkSquare(curSquare, square, recurse) {
                 curSquare.cellDisplay.style.backgroundColor = "green";
             }
 
+            if (curSquare.entropy != 1) {
+                curSquare.cellDisplay.onclick = function() {userChoosing(curSquare)};
+            }
+
             if (recurse && curSquare.entropy == 1) {
                 solveOne(curSquare, true);
             }
@@ -177,8 +181,36 @@ function calcInitialEntropy() {
     });
 }
 
+function solve() {
+    // console.log("Solve Running");
+    let searchEntropy = 2;
+    let origin = 0;
+    let position = 0;
+    let curSquare = squares[position];
+    
+    while (searchEntropy < 3 && solvedSquares < 81) {
+            do {
+                // console.log(curSquare.entropy + " " + origin);
+                if (curSquare.entropy == searchEntropy) {
+                    //Test curSquare forEach possibility
+                        //Remove failures
+                    for (let i = 0; i < curSquare.entropy; i++) {
+
+                    }
+                    // curSquare.entropy = 10;
+                    // curSquare.cellDisplay.innerText = curSquare.entropy;
+                    origin = position;
+                }
+                
+                position = (position+1) % 81;
+                curSquare = squares[position];
+            } while (position != origin);
+        searchEntropy++;
+    }
+}
+
 function solveOneRecursive() {
-    if (solvedSquares == 0) {
+    if (solvedSquares == 81) {
         return;
     }
 
@@ -191,7 +223,7 @@ function solveOneRecursive() {
 }
 
 function solveOne(square, recurse) {
-    if (square.entropy != 1) {
+    if (square.entropy != 1 || solvedSquares == 81) {
         return;
     }
 
@@ -293,9 +325,10 @@ function clearBoard() {
     entropyDisplay.innerHTML = " " + (81 - solvedSquares);
     squares.forEach(square => {
         square.cellValue = 0;
-        square.cellDisplay.innerText = "";
+        square.cellDisplay.innerText = ""
         square.entropy = 9;
         square.possi = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        square.cellDisplay.style.backgroundColor = null;
     });
 }
 
@@ -303,3 +336,125 @@ function clearBoard() {
 function userInitiateOne(square) {
     solveOne(square, false);
 }
+
+function userChoosing(square) {
+    const buttons = document.getElementById("options");
+    while (buttons.hasChildNodes()) {
+        buttons.removeChild(buttons.firstChild);
+    }
+
+    square.possi.forEach(element => {
+        if (element != 0) {
+            let button = document.createElement("BUTTON");
+            button.innerText = element;
+            button.onclick = function() {userChose(square, element, buttons)}
+            buttons.appendChild(button);
+        }
+    });
+}
+
+function userChose(square, element) {
+    console.log("Hello");
+    square.cellValue = element;
+    square.entropy = 1;
+    // square.possi.forEach(val => {
+    //     if (element != val) {
+    //         val = 0;
+    //     }
+    // });
+    for (let i = 0; i < square.possi.length; i++) {
+        if (element != square.possi[i]) {
+            square.possi[i] = 0;
+        }
+    }
+    square.cellDisplay.innerText = element;
+    square.cellDisplay.style.color = "black";
+    square.cellDisplay.style.backgroundColor = null;
+    solvedSquares++;
+    entropyDisplay.innerHTML = " " + (81 - solvedSquares);
+    square.cellDisplay.onclick = null;
+
+    const buttons = document.getElementById("options");
+    while (buttons.hasChildNodes()) {
+        buttons.removeChild(buttons.firstChild);
+    }
+
+    solveOne(square, true);
+}
+
+function checkFullErrors() {
+    squares.forEach(square => {
+        checkErrors(square, true);
+    });
+}
+
+function checkErrors(square, displayErrors) {
+    // Token value used to display all falures if requested
+    // Otherwise function returns failure on first instance.
+    let displayErrorsTest = false;
+
+    // Rows
+    let i = calcRowStart(square.id+1)-1;
+    let end_i = i + 9;
+    while (i < end_i) {
+        if (squares[i].id != square.id && squares[i].cellValue == square.cellValue) {
+            if (displayErrors) {
+                square.cellDisplay.style.backgroundColor = "red";
+                squares[i].cellDisplay.style.backgroundColor = "red";
+                displayErrorsTest = true;
+            } else {
+                return false;
+            }
+        }
+        i++;
+    }
+
+    // Columns
+    let j = calcColumnStart(square.id+1)-1;
+    let end_j = j + 73;
+    while (j < end_j) {
+        if (squares[j].id != square.id && squares[j].cellValue == square.cellValue) {
+            if (displayErrors) {
+                square.cellDisplay.style.backgroundColor = "red";
+                squares[j].cellDisplay.style.backgroundColor = "red";
+                displayErrorsTest = true;
+            } else {
+                return false;
+            }
+        }
+        j += 9;
+    }
+
+    // SubSquares
+    let k = calcSubSquareStart(square.id+1)-1;
+    let end_k = k + 21;
+    while (k < end_k) {
+        if (squares[k].id != square.id && squares[k].cellValue == square.cellValue) {
+            if (displayErrors) {
+                square.cellDisplay.style.backgroundColor = "red";
+                squares[k].cellDisplay.style.backgroundColor = "red";
+                displayErrorsTest = true;
+            } else {
+                return false;
+            }
+        }
+        if ((k+1)%3 == 0) {
+            k += 7;
+        } else {
+            k++;
+        }
+    }
+
+    if (displayErrorsTest == true) {
+        return false;
+    }
+}
+// let cellDisplay = document.createElement("div");
+// let possibilities = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+// let cell = {
+//     cellDisplay : cellDisplay,
+//     id : total,
+//     cellValue : 0,
+//     entropy : 9,
+//     possi : possibilities
+// };
