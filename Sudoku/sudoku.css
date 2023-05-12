@@ -26,6 +26,8 @@ body {
 #displayValues {
     /* float: right; */
     /* display: none; */
+    opacity: 0;
+    transition: 0.5s;
     margin-left: 20px;
     width: 15vw;
     font-size: 1vw;
@@ -35,6 +37,19 @@ body {
     /* margin: auto; */
     /* max-width: 50%; */
 }
+
+/* .fade-in {
+    animation: fadeIn 5s;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+} */
 
 #sudokuGrid {
     /* margin: auto; */

@@ -55,7 +55,8 @@ function makeGrid() {
 
                         cellDisplay.onmouseover = function(){updateDisplayData(cell)}
                         cellDisplay.onmouseout = function() {
-                            document.getElementById("displayValues").style.visibility = "hidden";
+                            // document.getElementById("displayValues").style.visibility = "hidden";
+                            document.getElementById("displayValues").style.opacity = 0;
                         };
                         
                         squares[total] = cell;
@@ -122,25 +123,31 @@ function inputFromCode() {
 
 function checkSquare(curSquare, square, recurse) {
     if (curSquare.entropy != 0 && curSquare.entropy != 1) {
-        if (curSquare.possi[square.cellValue-1]) {
-            curSquare.possi[square.cellValue-1] = 0;
-            curSquare.entropy--;
-
-            // Temp display entropy
-            curSquare.cellDisplay.innerText = curSquare.entropy;
-            curSquare.cellDisplay.style.color = "red";
-
-            if (curSquare.entropy == 1) {
-                curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
-                curSquare.cellDisplay.style.backgroundColor = "green";
-            }
-
-            if (curSquare.entropy != 1) {
-                curSquare.cellDisplay.onclick = function() {userChoosing(curSquare)};
-            }
-
-            if (recurse && curSquare.entropy == 1) {
-                solveOne(curSquare, true);
+        for (let p = 0; p < 9; p++) {
+            if (square.possi[p] && curSquare.possi[p]) {
+                curSquare.possi[p] = 0;
+                curSquare.entropy--;
+    
+                // Temp display entropy
+                curSquare.cellDisplay.innerText = curSquare.entropy;
+                curSquare.cellDisplay.style.color = "red";
+    
+                if (curSquare.entropy == 1) {
+                    curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
+                    curSquare.cellDisplay.style.backgroundColor = "green";
+                }
+    
+                if (curSquare.entropy != 1) {
+                    curSquare.cellDisplay.onclick = function() {userChoosing(curSquare)};
+                }
+    
+                if (recurse && curSquare.entropy == 1) {
+                    solveOne(curSquare, true);
+                }
+    
+                if (recurse && curSquare.entropy == 2) {
+                    solvePairs(curSquare, true);
+                }
             }
         }
     }
@@ -209,6 +216,7 @@ function solve() {
     }
 }
 
+// Temporary Test Function
 function solveOneRecursive() {
     if (solvedSquares == 81) {
         return;
@@ -218,6 +226,9 @@ function solveOneRecursive() {
     squares.forEach(square => {
         if (square.entropy == 1) {
             solveOne(square, true);
+        }
+        if (square.entropy == 2) {
+            solvePairs(square, true);
         }
     });
 }
@@ -271,6 +282,75 @@ function solveOne(square, recurse) {
     }
 }
 
+function solvePairs(square, recurse) {
+        // console.log("solvePairs " + square.possi);
+        if (square.entropy != 2 || solvedSquares == 81) {
+            return;
+        }
+
+        // Rows
+        let i = calcRowStart(square.id+1)-1;
+        let end_i = i + 9;
+        while (i < end_i) {
+            if (squares[i].id != square.id && squares[i].possi.toString() == square.possi.toString()) {
+                // console.log(squares[i].id + ", " + square.id + ", " + square.possi);
+                let p = calcRowStart(square.id+1)-1;
+                while (p < end_i) {
+                    if (squares[p].id != squares[i].id && squares[p].id != square.id) {
+                        checkSquare(squares[p], square, recurse);
+                    }
+                    p++;
+                }
+                break;
+            }
+            i++;
+        }
+    
+        // Columns
+        let j = calcColumnStart(square.id+1)-1;
+        let end_j = j + 73;
+        while (j < end_j) {
+            if (squares[j].id != square.id && squares[j].possi.toString() == square.possi.toString()) {
+                // console.log(squares[j].id + ", " + square.id + ", " + square.possi);
+                let p = calcColumnStart(square.id+1)-1;
+                while (p < end_j) {
+                    if (squares[p].id != squares[j].id && squares[p].id != square.id) {
+                        checkSquare(squares[p], square, recurse);
+                    }
+                    p += 9;
+                }
+                break;
+            }
+            j += 9;
+        }
+    
+        // SubSquares
+        let k = calcSubSquareStart(square.id+1)-1;
+        let end_k = k + 21;
+        while (k < end_k) {
+            if (squares[k].id != square.id && squares[k].possi.toString() == square.possi.toString()) {
+                // console.log(squares[k].id + ", " + square.id + ", " + square.possi);
+                let p = calcSubSquareStart(square.id+1)-1;
+                while (p < end_k) {
+                    if (squares[p].id != squares[k].id && squares[p].id != square.id) {
+                        checkSquare(squares[p], square, recurse);
+                    }
+                    if ((p+1)%3 == 0) {
+                        p += 7;
+                    } else {
+                        p++;
+                    }
+                }
+                break;
+            }
+            if ((k+1)%3 == 0) {
+                k += 7;
+            } else {
+                k++;
+            }
+        }
+}
+
 function calcRowStart(value) {
     if (value%9) {
         return value - (value%9) + 1;
@@ -306,7 +386,8 @@ function updateDisplayData(square) {
     // square = squares[0];
 
     let displayValues = document.getElementById("displayValues");
-    displayValues.style.visibility = "visible";
+    // displayValues.style.visibility = "visible";
+    displayValues.style.opacity = 1;
 
     let possi = [];
     let i = 0;
@@ -325,9 +406,10 @@ function clearBoard() {
     entropyDisplay.innerHTML = " " + (81 - solvedSquares);
     squares.forEach(square => {
         square.cellValue = 0;
-        square.cellDisplay.innerText = ""
+        square.cellDisplay.innerText = "";
         square.entropy = 9;
         square.possi = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        square.cellDisplay.onclick = null;
         square.cellDisplay.style.backgroundColor = null;
     });
 }
@@ -383,27 +465,33 @@ function userChose(square, element) {
 }
 
 function checkFullErrors() {
+    // checkErrors(squares[3], false);
+    // checkErrors(squares[24], true);
     squares.forEach(square => {
-        checkErrors(square, true);
+        console.log("Error check returned: " + checkErrors(square, true));
     });
 }
 
 function checkErrors(square, displayErrors) {
-    // Token value used to display all falures if requested
-    // Otherwise function returns failure on first instance.
-    let displayErrorsTest = false;
+    // displayErrors: boolean
+    //  Token value used to display all falures if requested
+    //  Otherwise function returns failure on first instance.
+    let foundError = false;
 
     // Rows
     let i = calcRowStart(square.id+1)-1;
     let end_i = i + 9;
     while (i < end_i) {
-        if (squares[i].id != square.id && squares[i].cellValue == square.cellValue) {
+        // console.log(square.id);
+        if (squares[i].id != square.id && squares[i].cellValue == square.cellValue && squares[i].cellValue != 0) {
+            console.log("Rows:");
+            console.log(squares[i].id + ", " + square.id);
             if (displayErrors) {
                 square.cellDisplay.style.backgroundColor = "red";
                 squares[i].cellDisplay.style.backgroundColor = "red";
-                displayErrorsTest = true;
+                foundError = true;
             } else {
-                return false;
+                return true;
             }
         }
         i++;
@@ -413,13 +501,15 @@ function checkErrors(square, displayErrors) {
     let j = calcColumnStart(square.id+1)-1;
     let end_j = j + 73;
     while (j < end_j) {
-        if (squares[j].id != square.id && squares[j].cellValue == square.cellValue) {
+        if (squares[j].id != square.id && squares[j].cellValue == square.cellValue && squares[j].cellValue != 0) {
+            console.log("Columns:");
+            console.log(squares[j].id + ", " + square.id);
             if (displayErrors) {
                 square.cellDisplay.style.backgroundColor = "red";
                 squares[j].cellDisplay.style.backgroundColor = "red";
-                displayErrorsTest = true;
+                foundError = true;
             } else {
-                return false;
+                return true;
             }
         }
         j += 9;
@@ -429,13 +519,15 @@ function checkErrors(square, displayErrors) {
     let k = calcSubSquareStart(square.id+1)-1;
     let end_k = k + 21;
     while (k < end_k) {
-        if (squares[k].id != square.id && squares[k].cellValue == square.cellValue) {
+        if (squares[k].id != square.id && squares[k].cellValue == square.cellValue && squares[k].cellValue != 0) {
+            console.log("Squares:");
+            console.log(squares[k].id + ", " + square.id);
             if (displayErrors) {
                 square.cellDisplay.style.backgroundColor = "red";
                 squares[k].cellDisplay.style.backgroundColor = "red";
-                displayErrorsTest = true;
+                foundError = true;
             } else {
-                return false;
+                return true;
             }
         }
         if ((k+1)%3 == 0) {
@@ -445,9 +537,8 @@ function checkErrors(square, displayErrors) {
         }
     }
 
-    if (displayErrorsTest == true) {
-        return false;
-    }
+    return foundError;
+
 }
 // let cellDisplay = document.createElement("div");
 // let possibilities = [1, 2, 3, 4, 5, 6, 7, 8, 9];
