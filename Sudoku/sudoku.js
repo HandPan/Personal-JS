@@ -6,8 +6,6 @@
 // document.write(2*5+6/5);
 // window.alert(5+6);
 
-// Account Test
-
 function testJS() {
 
     document.getElementById("testButton").innerHTML = "It Worked!";
