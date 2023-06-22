@@ -1,7 +1,8 @@
 # Personal-JS
 This repository is used to keep up to date on my JavaScript, HTML, CSS, and other web development tools skills. It will host any personal javascript projects that I am working on and plan to display.
 
---------------The current list of projects------------------
+The current list of projects
+----------------------------
 Sudoku
 ------
 This is an ongoing project to better understand and utalize the WaveFuntionCollapse algorithm and entropy in world/texture generation.
