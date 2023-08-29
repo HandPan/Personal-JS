@@ -121,36 +121,48 @@ function inputFromCode() {
     }
 }
 
-function checkSquare(curSquare, square, recurse) {
-    if (curSquare.entropy != 0 && curSquare.entropy != 1) {
+function checkSquare(curSquare, square, frameOfReference, recurse, testing) {
+    if ((curSquare.entropy != 0 && curSquare.entropy != 1) || testing) {
         for (let p = 0; p < 9; p++) {
-            if (square.possi[p] && curSquare.possi[p]) {
+            if (square.possi[p] && curSquare.possi[p] && curSquare != square) {
+
+                if (testing) {
+                    if (curSquare.entropy == 0 || curSquare.entropy == 1) {
+                        square.cellDisplay.style.backgroundColor = "red";
+                        curSquare.cellDisplay.style.backgroundColor = "red";
+                        curSquare.cellDisplay.style.color = "black";
+                        console.log("Found a fault");
+                        return false;
+                    }
+                }
+
                 curSquare.possi[p] = 0;
                 curSquare.entropy--;
-    
+
                 // Temp display entropy
                 curSquare.cellDisplay.innerText = curSquare.entropy;
                 curSquare.cellDisplay.style.color = "red";
-    
+
                 if (curSquare.entropy == 1) {
                     curSquare.cellDisplay.onclick = function(){userInitiateOne(curSquare)};
                     curSquare.cellDisplay.style.backgroundColor = "green";
                 }
-    
+
                 if (curSquare.entropy != 1) {
                     curSquare.cellDisplay.onclick = function() {userChoosing(curSquare)};
                 }
-    
+
                 if (recurse && curSquare.entropy == 1) {
-                    solveOne(curSquare, true);
+                    return solveOne(curSquare, frameOfReference, true, testing);
                 }
-    
+
                 if (recurse && curSquare.entropy == 2) {
-                    solvePairs(curSquare, true);
+                    return solvePairs(curSquare, frameOfReference, true, testing);
                 }
             }
         }
     }
+    return true;
 }
 
 function calcInitialEntropy() {
@@ -161,7 +173,7 @@ function calcInitialEntropy() {
             let i = calcRowStart(square.id+1)-1;
             let end_i = i + 9;
             while (i < end_i) {
-                checkSquare(squares[i], square, false);
+                checkSquare(squares[i], square, squares, false, false);
                 i++;
             }
 
@@ -169,7 +181,7 @@ function calcInitialEntropy() {
             let j = calcColumnStart(square.id+1)-1;
             let end_j = j + 73;
             while (j < end_j) {
-                checkSquare(squares[j], square, false);
+                checkSquare(squares[j], square, squares, false, false);
                 j += 9;
             }
 
@@ -177,7 +189,7 @@ function calcInitialEntropy() {
             let k = calcSubSquareStart(square.id+1)-1;
             let end_k = k + 21;
             while (k < end_k) {
-                checkSquare(squares[k], square, false);
+                checkSquare(squares[k], square, squares, false, false);
                 if ((k+1)%3 == 0) {
                     k += 7;
                 } else {
@@ -188,30 +200,106 @@ function calcInitialEntropy() {
     });
 }
 
-function solve() {
-    // console.log("Solve Running");
-    let searchEntropy = 2;
-    let origin = 0;
-    let position = 0;
-    let curSquare = squares[position];
-    
-    while (searchEntropy < 3 && solvedSquares < 81) {
-            do {
-                // console.log(curSquare.entropy + " " + origin);
-                if (curSquare.entropy == searchEntropy) {
-                    //Test curSquare forEach possibility
-                        //Remove failures
-                    for (let i = 0; i < curSquare.entropy; i++) {
+function copyFrameOfReference(frameOfReference) {
 
+    let newFoR = new Array(81);
+    for (let k = 0; k < 81; k++) {
+        let tempPossi = new Array(9);
+        for (let i = 0; i < 9; i++) {
+            tempPossi[i] = frameOfReference[k].possi[i]
+        }
+        let cell = {
+            cellDisplay : frameOfReference[k].cellDisplay,
+            id : frameOfReference[k].id,
+            cellValue : frameOfReference[k].cellValue,
+            entropy : frameOfReference[k].entropy,
+            possi : tempPossi
+        };
+        newFoR[k] = cell;
+
+        cell.cellDisplay.onmouseover = function(){updateDisplayData(cell)}
+        cell.cellDisplay.onmouseout = function() {
+            // document.getElementById("displayValues").style.visibility = "hidden";
+            document.getElementById("displayValues").style.opacity = 0;
+        };
+    }
+
+    return newFoR;
+}
+
+function solve(origin, frameOfReference) {
+    console.log("Solve Running SolvedSquares: " + solvedSquares);
+    let searchEntropy = 2;
+    // let origin = 0;
+    let position = origin;
+
+    let workingFoR = copyFrameOfReference(frameOfReference);
+
+    let curSquare = workingFoR[position];
+    solvedSquaresMem = solvedSquares;
+    
+    while (searchEntropy < 9) {
+        do {
+            if (curSquare.entropy == searchEntropy) {
+                console.log("curSquare: " + curSquare.id);
+                for (let i = 0; i < 9; i++) {
+                    if (curSquare.possi[i]) {
+                        console.log("Working Val: " + curSquare.possi[i]);
+
+                        let entropyMem = curSquare.entropy;
+                        let possiMem = new Array(9).fill(0);
+                        curSquare.entropy = 1;
+                        for (let j = 0; j < 9; j++) {
+                            if (curSquare.possi[j] != curSquare.possi[i]) {
+                                possiMem[j] = curSquare.possi[j];
+                                curSquare.possi[j] = 0;
+                            }
+                        }
+                        console.log(curSquare.possi);
+                        console.log(possiMem);
+                        if (solveOne(curSquare, workingFoR, true, true)) {
+                            if (solvedSquares >= 81) {
+                                console.log("SOLVED!!! " + solvedSquares);
+                                squares = workingFoR;
+                                return true;
+                            }
+                            if(solve(((position+1) % 81), workingFoR)) {
+                                return true;
+                            } else {
+                                console.log("Solve Failed");
+                                workingFoR = copyFrameOfReference(frameOfReference);
+                                curSquare = workingFoR[position];
+                                curSquare.entropy = entropyMem--;
+                                console.log(curSquare.possi);
+                                for (let j = 0; j < 9; j++) {
+                                    curSquare.possi[j] = possiMem[j];
+                                }
+
+                                solvedSquares = solvedSquaresMem;
+                                continue;
+                            }
+                        } else {
+                            console.log("solveOne Failed on: " + curSquare.id);
+                            workingFoR = copyFrameOfReference(frameOfReference);
+                            curSquare = workingFoR[position];
+                            curSquare.entropy = entropyMem--;
+                            console.log(curSquare.possi);
+                            for (let j = 0; j < 9; j++) {
+                                curSquare.possi[j] = possiMem[j];
+                            }
+
+                            solvedSquares = solvedSquaresMem;
+                        }
                     }
-                    // curSquare.entropy = 10;
-                    // curSquare.cellDisplay.innerText = curSquare.entropy;
-                    origin = position;
                 }
-                
-                position = (position+1) % 81;
-                curSquare = squares[position];
-            } while (position != origin);
+
+                return false;
+            }
+            
+            position = (position+1) % 81;
+            curSquare = workingFoR[position];
+        } while (position != origin);
+
         searchEntropy++;
     }
 }
@@ -225,16 +313,20 @@ function solveOneRecursive() {
     calcInitialEntropy();
     squares.forEach(square => {
         if (square.entropy == 1) {
-            solveOne(square, true);
+            solveOne(square, squares, true, false);
         }
         if (square.entropy == 2) {
-            solvePairs(square, true);
+            solvePairs(square, squares, true, false);
         }
     });
+
+    // solve(0, copyFrameOfReference(squares));
+    solve(0, copyFrameOfReference(squares));
 }
 
-function solveOne(square, recurse) {
-    if (square.entropy != 1 || solvedSquares == 81) {
+function solveOne(square, frameOfReference, recurse, testing) {
+    // console.log("Order: " + square.id);
+    if (square.entropy != 1) {
         return;
     }
 
@@ -250,14 +342,20 @@ function solveOne(square, recurse) {
         square.cellDisplay.onclick = null;
         square.cellDisplay.style.backgroundColor = null;
         solvedSquares++;
-        entropyDisplay.innerHTML = " " + (81 - solvedSquares);
+        
+        if (!testing) {
+            entropyDisplay.innerHTML = " " + (81 - solvedSquares);
+        }
     }
 
     // Rows
     let i = calcRowStart(square.id+1)-1;
     let end_i = i + 9;
     while (i < end_i) {
-        checkSquare(squares[i], square, recurse);
+        if (!checkSquare(frameOfReference[i], square, frameOfReference, recurse, testing)) {
+            solvedSquares--;
+            return false;
+        }
         i++;
     }
 
@@ -265,7 +363,10 @@ function solveOne(square, recurse) {
     let j = calcColumnStart(square.id+1)-1;
     let end_j = j + 73;
     while (j < end_j) {
-        checkSquare(squares[j], square, recurse);
+        if (!checkSquare(frameOfReference[j], square, frameOfReference, recurse, testing)) {
+            solvedSquares--;
+            return false;
+        }
         j += 9;
     }
 
@@ -273,82 +374,94 @@ function solveOne(square, recurse) {
     let k = calcSubSquareStart(square.id+1)-1;
     let end_k = k + 21;
     while (k < end_k) {
-        checkSquare(squares[k], square, recurse);
+        if (!checkSquare(frameOfReference[k], square, frameOfReference, recurse, testing)) {
+            solvedSquares--;
+            return false;
+        }
         if ((k+1)%3 == 0) {
             k += 7;
         } else {
             k++;
         }
     }
+
+    return true;
 }
 
-function solvePairs(square, recurse) {
-        // console.log("solvePairs " + square.possi);
-        if (square.entropy != 2 || solvedSquares == 81) {
-            return;
-        }
+function solvePairs(square, frameOfReference, recurse, testing) {
+    // console.log("solvePairs " + square.possi);
+    if (square.entropy != 2 || solvedSquares == 81) {
+        // return;
+    }
 
-        // Rows
-        let i = calcRowStart(square.id+1)-1;
-        let end_i = i + 9;
-        while (i < end_i) {
-            if (squares[i].id != square.id && squares[i].possi.toString() == square.possi.toString()) {
-                // console.log(squares[i].id + ", " + square.id + ", " + square.possi);
-                let p = calcRowStart(square.id+1)-1;
-                while (p < end_i) {
-                    if (squares[p].id != squares[i].id && squares[p].id != square.id) {
-                        checkSquare(squares[p], square, recurse);
+    // Rows
+    let i = calcRowStart(square.id+1)-1;
+    let end_i = i + 9;
+    while (i < end_i) {
+        if (frameOfReference[i].id != square.id && frameOfReference[i].possi.toString() == square.possi.toString()) {
+            // console.log(squares[i].id + ", " + square.id + ", " + square.possi);
+            let p = calcRowStart(square.id+1)-1;
+            while (p < end_i) {
+                if (frameOfReference[p].id != frameOfReference[i].id && frameOfReference[p].id != square.id) {
+                    if (!checkSquare(frameOfReference[p], square, frameOfReference, recurse, testing)) {
+                        return false;
                     }
+                }
+                p++;
+            }
+            break;
+        }
+        i++;
+    }
+
+    // Columns
+    let j = calcColumnStart(square.id+1)-1;
+    let end_j = j + 73;
+    while (j < end_j) {
+        if (frameOfReference[j].id != square.id && frameOfReference[j].possi.toString() == square.possi.toString()) {
+            // console.log(squares[j].id + ", " + square.id + ", " + square.possi);
+            let p = calcColumnStart(square.id+1)-1;
+            while (p < end_j) {
+                if (frameOfReference[p].id != frameOfReference[j].id && frameOfReference[p].id != square.id) {
+                    if (!checkSquare(frameOfReference[p], square, frameOfReference, recurse, testing)) {
+                        return false;
+                    }
+                }
+                p += 9;
+            }
+            break;
+        }
+        j += 9;
+    }
+
+    // SubSquares
+    let k = calcSubSquareStart(square.id+1)-1;
+    let end_k = k + 21;
+    while (k < end_k) {
+        if (frameOfReference[k].id != square.id && frameOfReference[k].possi.toString() == square.possi.toString()) {
+            // console.log(squares[k].id + ", " + square.id + ", " + square.possi);
+            let p = calcSubSquareStart(square.id+1)-1;
+            while (p < end_k) {
+                if (frameOfReference[p].id != frameOfReference[k].id && frameOfReference[p].id != square.id) {
+                    if (!checkSquare(frameOfReference[p], square, frameOfReference, recurse, testing)) {
+                        return false;
+                    }
+                }
+                if ((p+1)%3 == 0) {
+                    p += 7;
+                } else {
                     p++;
                 }
-                break;
             }
-            i++;
+            break;
         }
-    
-        // Columns
-        let j = calcColumnStart(square.id+1)-1;
-        let end_j = j + 73;
-        while (j < end_j) {
-            if (squares[j].id != square.id && squares[j].possi.toString() == square.possi.toString()) {
-                // console.log(squares[j].id + ", " + square.id + ", " + square.possi);
-                let p = calcColumnStart(square.id+1)-1;
-                while (p < end_j) {
-                    if (squares[p].id != squares[j].id && squares[p].id != square.id) {
-                        checkSquare(squares[p], square, recurse);
-                    }
-                    p += 9;
-                }
-                break;
-            }
-            j += 9;
+        if ((k+1)%3 == 0) {
+            k += 7;
+        } else {
+            k++;
         }
-    
-        // SubSquares
-        let k = calcSubSquareStart(square.id+1)-1;
-        let end_k = k + 21;
-        while (k < end_k) {
-            if (squares[k].id != square.id && squares[k].possi.toString() == square.possi.toString()) {
-                // console.log(squares[k].id + ", " + square.id + ", " + square.possi);
-                let p = calcSubSquareStart(square.id+1)-1;
-                while (p < end_k) {
-                    if (squares[p].id != squares[k].id && squares[p].id != square.id) {
-                        checkSquare(squares[p], square, recurse);
-                    }
-                    if ((p+1)%3 == 0) {
-                        p += 7;
-                    } else {
-                        p++;
-                    }
-                }
-                break;
-            }
-            if ((k+1)%3 == 0) {
-                k += 7;
-            } else {
-                k++;
-            }
-        }
+    }
+    return true;
 }
 
 function calcRowStart(value) {
@@ -416,7 +529,9 @@ function clearBoard() {
 
 // Test/Partial Implementation
 function userInitiateOne(square) {
-    solveOne(square, false);
+    if (!solveOne(square, squares, false, true)) {
+        console.log("FAILURE SolveOne");
+    }
 }
 
 function userChoosing(square) {
@@ -437,7 +552,7 @@ function userChoosing(square) {
 
 function userChose(square, element) {
     console.log("Hello");
-    square.cellValue = element;
+    // square.cellValue = element;
     square.entropy = 1;
     // square.possi.forEach(val => {
     //     if (element != val) {
@@ -461,7 +576,9 @@ function userChose(square, element) {
         buttons.removeChild(buttons.firstChild);
     }
 
-    solveOne(square, true);
+    if (!solveOne(square, squares, false, true)) {
+        console.log("FAILURE SolveOne");
+    }
 }
 
 function checkFullErrors() {
@@ -474,7 +591,7 @@ function checkFullErrors() {
 
 function checkErrors(square, displayErrors) {
     // displayErrors: boolean
-    //  Token value used to display all falures if requested
+    //  Token value used to display all failures if requested
     //  Otherwise function returns failure on first instance.
     let foundError = false;
 
