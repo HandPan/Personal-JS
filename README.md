@@ -6,8 +6,13 @@ The current list of projects
 Sudoku
 ------
 This is an ongoing project to better understand and utalize the WaveFuntionCollapse algorithm and entropy in world/texture generation.
-Eventually I plan to work on a 2d generator using uploaded tiles and rules in how they connect to generate various sudo random images using this algorithm.
+This project has reached its end in this repository. It has since moved to my own personal repo in which it will soon be included with some user acessibility and UX modifications to my own personal site.
+Users will soon be able to have control over multiple settings to allow for the best understanding of the underlying functions and principles.
 
+Wave-Function Image Generator
+-----------------------------
+The cleanest example of the use of the Wave Function Collapse algorithm is in the demonstration in creating similar but different images from a set of base smaller images and rules defining their neighbors.
+This is the host location of the project soon to be added live to my personal website.
 
 Piano Visualizer
 ----------------
